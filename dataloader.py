@@ -108,10 +108,10 @@ def get_data(hours_to_load=26,
             samples_per_hour = 0
         elif hours_to_load  <= 7*24:
             # At most 1 week
-            samples_per_hour = 30
+            samples_per_hour = 6
         else:
             # Loooong
-            samples_per_hour = 5000/hours_to_load
+            samples_per_hour = 2000/hours_to_load
             
     if samples_per_hour > 0:
         # Greater than 0 means downsampling must be applied.
@@ -119,7 +119,7 @@ def get_data(hours_to_load=26,
         
         expected_max_num_data_points = int(samples_per_hour * hours_to_load)
     
-        bin_width_minutes = 10 # 7*24*6 = 1008 datapoints in a week with 10 minute bins
+        bin_width_seconds = int(3600.0/samples_per_hour) # Must be integer, np.timedelta64 is a bit stupid
 
         d_ds = np.zeros(expected_max_num_data_points, dtype=d.dtype)
                 
@@ -127,7 +127,7 @@ def get_data(hours_to_load=26,
         starting_index = 0
         vector_index = 0
         while starting_time < d['datetime'][-1]:
-            end_time = starting_time + np.timedelta64(bin_width_minutes, 'm')
+            end_time = starting_time + np.timedelta64(bin_width_seconds, 's')
             
             #To save CPU time on the poor *pi, we'll keep track of indexes
             # (instead of re-determinng the index every time again)
