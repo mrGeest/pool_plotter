@@ -23,12 +23,12 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 
 #%% Load some data
 
-d = dataloader.get_data()
+d = dataloader.get_data(hours_to_load=27) # We want the last 24 hours, +2 more to correlate trends
 
 #%% Inner plot function
 
 @ticker.FuncFormatter
-def c2f_formatter(x, pos):
+def c2f_formatter(x, pos): # Arguments name x and pos for clarity w.r.t. matplotlib documentation
     deg_F = ((x/5)*9)+32
     return f"{deg_F:0.1f}"
 
@@ -67,14 +67,15 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax2 = ax1.twinx()
     ax2.set_ylabel(ylab2)
 
-    #f.autofmt_xdate()
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['left'].set_visible(False)
+
 
     plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
 
-    # round x range to nearest years.
+    # round x range to nearest hours.
     datemax = np.datetime64(d['datetime'][-1], 'h') + np.timedelta64(1, 'h')
-    #datemin = np.datetime64(d['datetime'][0], 'h') # Auto plot range, will show all data
-    datemin = datemax - np.timedelta64(24, 'h') # Exactly one day
+    datemin = datemax - np.timedelta64(26, 'h') # Exactly one day +2 hours
     if StrictVersion(matplotlib.__version__) < StrictVersion('2.2.2'):
         datemin = datemin.astype('O')
         datemax = datemax.astype('O')
@@ -90,23 +91,20 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax2.set_ylim(yt[0], yt[-1])
     
     # Overwrite the tick decorator to convert C to F dynamically:
-    ax2.yaxis.set_major_formatter(c2f_formatter)
+    ax1.yaxis.set_major_formatter(c2f_formatter)
     
     
     ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
     ax1.grid(b=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
 
-
-    #f.tight_layout()
     return f, ax1
 
 def make_plots():
     f,a = make_plot('Temperatures',
               d['datetime'], # x axis
               [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
-              #[(d['temperature1'], 'BMP180')], # Y trace(s)
-              "Temperature (°C)", # y/ax1 label
-              "(°F)", # y/ax2 label
+              "Temperature (°F)", # y/ax1 label
+              "Temperature (°C)", # y/ax2 label
               )
     water_temp_file = "pool_temp_last24.svg"
     f.savefig(os.path.join(__location__, water_temp_file))
@@ -114,8 +112,8 @@ def make_plots():
     f,a = make_plot('sunambient',
               d['datetime'], # x axis
               [(d['sunambient'], 'Ambient in sun')], # Y trace(s)
-              "Ambient/sun temperature (°C)", # y/ax1 label
-              "(°F)", # y/ax2 label
+              "Ambient/sun temperature (°F)", # y/ax1 label
+              "(°C)", # y/ax2 label
               )
     sunambient_temp_file = "sunambient_temp_last24.svg"
     f.savefig(os.path.join(__location__, sunambient_temp_file))
@@ -123,8 +121,8 @@ def make_plots():
     f,a = make_plot('Enclosure',
               d['datetime'], # x axis
               [(d['enclosure'], 'Enclosure')], # Y trace(s)
-              "Enclosure temperature (°C)", # y/ax1 label
-              "(°F)", # y/ax2 label
+              "Enclosure temperature (°F)", # y/ax1 label
+              "(°C)", # y/ax2 label
               )
     enclosure_temp_file = "enclosure_temp_last24.svg"
     f.savefig(os.path.join(__location__, enclosure_temp_file))
@@ -132,8 +130,8 @@ def make_plots():
     f,a = make_plot('CPU Temperature',
               d['datetime'], # x axis
               [(d['cpu_temperature'], 'BMP180')], # Y trace(s)
-              "CPU temperature (°C)", # y/ax1 label
-              "(°F)", # y/ax2 label
+              "CPU temperature (°F)", # y/ax1 label
+              "(°C)", # y/ax2 label
               )
     cpu_temp_file = "pool_cpu_temp_last24.svg"
     f.savefig(os.path.join(__location__, cpu_temp_file))
