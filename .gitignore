@@ -1,1 +1,2 @@
-pool_logger_data/*.txt
+*.svg
+__pycache__/
