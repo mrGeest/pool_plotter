@@ -20,7 +20,7 @@ try:
     
 except:
     # Probably debug running locally
-    data_folder = 'logdata/'
+    data_folder = '../pool_logger_data/'
     
 
 #%% The main externally fonction

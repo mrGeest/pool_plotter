@@ -17,24 +17,37 @@ from shutil import copyfile
 #Get the current directory, where the image files are also created
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     
+
+
+
 #%% ---- Step 1, copy files from the upload folder to the local archiving folder ----
+# This only matters on the server, does nothing when running for debugging.
+
+try:
+    # path_config will exist on the server
+    import path_config    
+    target_folder = path_config.data_folder
+    upload_folder = path_config.upload_folder
     
-# (Copy only files with a specific prefixes, in case there is more than 1 project)
+except:
+    # Probably debug running locally
+    upload_folder = None
+    data_folder = '../pool_logger_data/'
     
-upload_folder = '/upload_folder/'
-target_folder = '/home/martin/pool_logger_data/'
+
 file_prefix = 'pool_' # May be empty to copy any file
     
-    
-for file in os.listdir(upload_folder):
-    
-    if file_prefix and not file.startswith(file_prefix):
-        # this file is not our problem
-        continue
-    
-    copyfile(upload_folder + file, target_folder + file)
-    
-    # Maybe also delete this file?
+if upload_folder is not None:
+    # Do try to copy
+    for file in os.listdir(upload_folder):
+        
+        if file_prefix and not file.startswith(file_prefix):
+            # this file is not our problem
+            continue
+        
+        copyfile(upload_folder + file, target_folder + file)
+        
+        # Maybe also delete this file?
     
 #%% ------ Step 2, call the various sub scripts and have them make their plots ----
 
