@@ -32,14 +32,18 @@ except:
 
 #%% ------ Step 2, call the various sub scripts and have them make their plots ----
 
+def copy_files(files):        
+    if web_server_folder is not None:
+        for file in files:
+            copyfile(os.path.join(__location__, file), web_server_folder + file)
+    
+
 import pool_plots_basic_week
-
-water_temp_file, sunambient_temp_file, enclosure_temp_file, cpu_temp_file = pool_plots_basic_week.make_plots()
-
-if web_server_folder is not None:
-    copyfile(os.path.join(__location__, cpu_temp_file), web_server_folder + cpu_temp_file)
-    copyfile(os.path.join(__location__, water_temp_file), web_server_folder + water_temp_file)
-    copyfile(os.path.join(__location__, sunambient_temp_file), web_server_folder + sunambient_temp_file)
-    copyfile(os.path.join(__location__, enclosure_temp_file), web_server_folder + enclosure_temp_file)
+outfiles = pool_plots_basic_week.make_plots()
+copy_files(outfiles)
+    
 
 
+import pool_plots_week_power
+outfiles = pool_plots_week_power.make_plots()
+copy_files(outfiles)
