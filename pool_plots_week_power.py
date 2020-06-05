@@ -34,7 +34,8 @@ today = datetime.date.today()
 water_volume = 128e3 # liters, which is taken to be kg in this script
 heat_capacity = 4186 # J/kg/K
 
-cutoff_freq_per_hour = 0.5
+pre_filter_cutoff_freq_per_hour = 0.8
+post_filter_cutoff_freq_per_hour = 6.2
 samples_per_hour = 20
 
 d = dataloader.get_data(hours_to_load=7*24, samples_per_hour=samples_per_hour)
@@ -49,7 +50,7 @@ def c2f_formatter(x, pos):
 
 #%% Plot function
 
-def make_plot(fnum, x, ydata, ylab, xlim=None):
+def make_plot(fnum, x, ydata, ylab, xlim=None, fill_in=True):
 
 
     major_locator = mdates.HourLocator(interval=12)   # every year
@@ -83,9 +84,14 @@ def make_plot(fnum, x, ydata, ylab, xlim=None):
         x = x.astype('O')
 
     for y, lab in ydata:
-        ax1.fill_between(x, 0, y, label=lab)
+        if fill_in:
+            ax1.fill_between(x, 0, y, label=lab)
+        else:
+            ax1.plot(x, y, label=lab)
+                
     ax1.set_ylabel(ylab)
-    ax1.set_axisbelow(True) # Needed with the 'fill_between' plots
+    if fill_in:
+        ax1.set_axisbelow(True) # Needed with the 'fill_between' plots
 
     if len(ydata) > 1:
         l = ax1.legend()
@@ -143,12 +149,15 @@ def make_plots(debug=False):
     xmax = np.datetime64(end_of_today) 
     
     
-    b, a = signal.filter_design.butter(2, cutoff_freq_per_hour/samples_per_hour)
+    b, a = signal.filter_design.butter(2, pre_filter_cutoff_freq_per_hour/samples_per_hour)
     pool1_filtered = signal.filtfilt(b, a, d['pool1'])
     
     temp_rate = np.diff(pool1_filtered)*samples_per_hour/3600 # in degrees per second
     
     heating_power = temp_rate*water_volume*heat_capacity # K/s * kg * J/kg/K = J/s
+
+    b, a = signal.filter_design.butter(2, post_filter_cutoff_freq_per_hour/samples_per_hour)
+    heating_power_filtered = signal.filtfilt(b, a, heating_power)
 
     if debug:
         f,a = make_plot('Temperatures',
@@ -156,6 +165,7 @@ def make_plots(debug=False):
                   [(d['pool1'], 'Sensor 1'), (pool1_filtered, 'Filtered')], # Y trace(s)
                   "Temperature (°C)", # y/ax1 label
                   xlim=[xmin,xmax],
+                  fill_in=False,
                   )
         power_file = "pool_heating_power_filtered_T_last_week.svg"
         f.savefig(os.path.join(__location__, power_file))
@@ -163,7 +173,7 @@ def make_plots(debug=False):
 
     f,a = make_plot('Temperatures',
               d['datetime'][:-1], # x axis
-              [(heating_power/1e3, 'Power')], # Y trace(s)
+              [ (heating_power_filtered/1e3, 'LPF power')], # Y trace(s)
               "Heating power (kW)", # y/ax1 label
               xlim=[xmin,xmax],
               )
