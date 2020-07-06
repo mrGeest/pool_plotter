@@ -140,7 +140,7 @@ def get_data(hours_to_load=26,
                 if name == 'datetime':
                     d_ds[name][vector_index] = starting_time + (end_time-starting_time)/2
                 else:
-                    d_ds[name][vector_index] = np.mean(d[name][starting_index:ending_index])
+                    d_ds[name][vector_index] = np.nanmean(d[name][starting_index:ending_index])
                        
             # We done?
             if ending_index >= len(d):
@@ -168,18 +168,22 @@ def _load_file(filename):
              ('sunambient', 'f4'),
              ]
 
-
     def parsetime(v):
         return np.datetime64(
             datetime.datetime.strptime(v.decode('ascii'), '%y%m%d_%H%M%S')
         )
-
+    
     data = np.loadtxt(filename, dtype=dtype,
                delimiter=';',
                skiprows=1,
                converters={0: parsetime},
                )
+               
+    broken_sensor = data['pool1'] < -5.0
+    data['pool1'][broken_sensor] = np.NaN
 
+    broken_sensor = data['pool2'] < -5.0
+    data['pool2'][broken_sensor] = np.NaN
 
     return data
 
