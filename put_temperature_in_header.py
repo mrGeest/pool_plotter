@@ -11,10 +11,10 @@ import numpy as np
 
 # Obtain the temperature
 try:
-    d = dataloader.get_data(hours_to_load=1)
-    temperature = np.nanmean([[-1]['pool1'], d[-1]['pool2']])
+   d = dataloader.get_data(hours_to_load=1)
+   temperature = np.nanmean([d[-1]['pool1'], d[-1]['pool2']])
 except:
-    temperature = 0.0
+   temperature = 0.0
 
 #print(temperature)
 
