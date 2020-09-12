@@ -14,6 +14,7 @@ import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 from distutils.version import StrictVersion
 from shutil import copyfile
+import datetime
 
 import dataloader
 
@@ -71,10 +72,9 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax2.spines['left'].set_visible(False)
 
 
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
-
     # round x range to nearest hours.
-    datemax = np.datetime64(d['datetime'][-1], 'h') + np.timedelta64(1, 'h')
+    #datemax = np.datetime64(d['datetime'][-1], 'h') + np.timedelta64(1, 'h') # Shows the last 26 hours of data of the data in the dateset. Will freeze when no new data is availalbe.
+    datemax = np.datetime64(datetime.datetime.now(), 'h') + np.timedelta64(1, 'h') # Shows the last 26 hours of data, might show empty plot if there is no data    
     datemin = datemax - np.timedelta64(26, 'h') # Exactly one day +2 hours
     if StrictVersion(matplotlib.__version__) < StrictVersion('2.2.2'):
         datemin = datemin.astype('O')
@@ -97,9 +97,12 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
     ax1.grid(b=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
 
+    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
+
     return f, ax1
 
 def make_plots():
+      
     f,a = make_plot('Temperatures',
               d['datetime'], # x axis
               [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)

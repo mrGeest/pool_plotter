@@ -76,29 +76,9 @@ def get_data(hours_to_load=26,
         
         
     # Step 2 - insert NaNs for gaps in data
-    
     if missing_data_threshold_minutes > 0:
-        time_s = (d['datetime'] - d['datetime'][0])/ np.timedelta64(1, 's') # Convert date time to seconds
-        t_delta = np.diff(time_s)
-        gaps = np.where(t_delta > missing_data_threshold_minutes*60)[0]
-        
-        # Insert a NaN after each occurence
-        points_inserted = 0
-        for index in range(len(gaps)):
-            # Creata a fake date time
-            gi = gaps[index] + points_inserted
-            gap_time = (d['datetime'][gi+1] - d['datetime'][gi]) 
-            dt_fake = d['datetime'][gi] + np.timedelta64(gap_time/2, 's')
+        d = insert_NaNs_for_gaps(d, missing_data_threshold_minutes) 
             
-            # Create a fake line
-            line = np.copy(d[gi])
-            for name in d[gi].dtype.names:
-                if name == 'datetime':
-                    line[name] = dt_fake
-                else:
-                    line[name] = np.NaN
-            
-            points_inserted += 1
             
     # Step 3 - downsample data
     if samples_per_hour is None:
@@ -133,7 +113,7 @@ def get_data(hours_to_load=26,
             # (instead of re-determinng the index every time again)
             ending_index = starting_index + 1
             while ending_index < len(d) and d['datetime'][ending_index] < end_time:
-                ending_index += 1
+                ending_index += 1                
                 
             # Average over the given window
             for name in d.dtype.names:
@@ -150,6 +130,9 @@ def get_data(hours_to_load=26,
             vector_index += 1
             starting_index = ending_index
             starting_time = d['datetime'][starting_index]
+
+        # The nanmean might have stripped any gap, so re-insert the gap
+        #d_ds = insert_NaNs_for_gaps(d_ds[:vector_index], missing_data_threshold_minutes)???
 
         return d_ds[:vector_index]
         
@@ -188,3 +171,33 @@ def _load_file(filename):
     return data
 
 
+#%%
+    
+def insert_NaNs_for_gaps(d, missing_data_threshold_minutes):
+    
+    time_s = (d['datetime'] - d['datetime'][0])/ np.timedelta64(1, 's') # Convert date time to seconds
+    t_delta = np.diff(time_s)
+    gaps = np.where(t_delta > missing_data_threshold_minutes*60)[0]
+    
+    # Insert a NaN after each occurence
+    points_inserted = 0
+    for index in range(len(gaps)):
+        # Creata a fake date time
+        gi = gaps[index] + points_inserted
+        gap_time = (d['datetime'][gi+1] - d['datetime'][gi]) 
+        dt_fake = d['datetime'][gi] + np.timedelta64(gap_time/2, 's')
+        
+        # Create a fake line
+        line = np.copy(d[gi])
+        for name in d[gi].dtype.names:
+            if name == 'datetime':
+                line[name] = dt_fake
+            else:
+                line[name] = np.NaN
+                
+        # Insert the line
+        d = np.insert(d, gi, line)
+        
+        points_inserted += 1
+
+    return d

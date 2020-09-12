@@ -134,14 +134,14 @@ def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
 
 def make_plots():
 
-#    number_of_days = 7
-#    start_of_period = datetime.datetime.combine(today-datetime.timedelta(days=number_of_days-1), datetime.datetime.min.time())
+    number_of_days = 31
+    start_of_period = datetime.datetime.combine(today-datetime.timedelta(days=number_of_days-1), datetime.datetime.min.time())
 #    end_of_today = datetime.datetime.combine(today, datetime.datetime.max.time())
-#    end_of_today = datetime.datetime.combine(today+datetime.timedelta(days=1), datetime.datetime.min.time())
+    end_of_today = datetime.datetime.combine(today+datetime.timedelta(days=1), datetime.datetime.min.time())
 
 
-#    xmin = np.datetime64(start_of_period)
-#    xmax = np.datetime64(end_of_today) #+ np.timedelta64(1, 'ms')
+    xmin = np.datetime64(start_of_period)
+    xmax = np.datetime64(end_of_today) #+ np.timedelta64(1, 'ms')
     
 
     f,a = make_plot('Temperatures',
@@ -149,7 +149,7 @@ def make_plots():
               [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
               "Temperature (°C)", # y/ax1 label
               "(°F)", # y/ax2 label
-              #xlim=[xmin,xmax],
+              xlim=[xmin,xmax],
               )
     water_temp_file = "pool_temp_last_month.svg"
     f.savefig(os.path.join(__location__, water_temp_file))
