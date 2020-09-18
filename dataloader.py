@@ -70,7 +70,7 @@ def get_data(hours_to_load=26,
         else:
             # append data
             d = np.concatenate((d, d_this))
-    
+            
     if not first_file_loaded:
         raise Exception('No data for entire range.')
         
@@ -143,14 +143,42 @@ def get_data(hours_to_load=26,
 
 
 def _load_file(filename):
-    dtype = [('datetime', 'datetime64[ms]'),
-             ('cpu_temperature', 'f4'),
-             ('enclosure', 'f4'),
-             ('pool1', 'f4'),
-             ('pool2', 'f4'),
-             ('sunambient', 'f4'),
+    
+    # Data description should look like a list :
+    # ('log file header name (exact)', ('fieldname_for_numpy', 'dtype'), fill_value)
+    # Extra header columns are ignored
+    # Missing columns are filled out with NaN
+    data_description = [
+             ('datetime',          ('datetime', 'datetime64[ms]'),  0),
+             ('CPU temp (°C)',     ('cpu_temperature', 'f4'),       np.NaN),
+             ('enclosure (°C)',    ('enclosure', 'f4'),             np.NaN),
+             ('pool1 (°C)',        ('pool1', 'f4'),                 np.NaN),
+             ('pool2 (°C)',        ('pool2', 'f4'),                 np.NaN),
+             #('control (°C)',      ('control', 'f4'),               np.NaN),
+             ('sun_ambient (°C)',  ('sunambient', 'f4'),            np.NaN),
              ]
+    
+    desired_fields = [ t[0] for t in data_description ]
 
+    # For each header name, find the column in the file with the exact same
+    # name, and if it exists, note down the column index
+    
+    # First get the header from the file
+    with open(filename, 'r', encoding="utf-8") as f:
+        header = f.readline().strip()
+        file_fields = header.split(';')
+                
+    # For each field in the file header, see if we need to load it, and if so,
+    # find the column it should end up under
+    file_col_indices = [file_fields.index(desired_field) for desired_field in desired_fields if desired_field in file_fields]
+    
+    # Prepare dtype:
+    dtype = [dtype for desired_field, dtype, *_ in data_description if desired_field in file_fields]
+    
+    # At this point, we have done what we need to:
+    # - handle extra columns we don't need
+    # - handle arbitrarily arranged columns (except for the datetime, because of the converter function)
+        
     def parsetime(v):
         return np.datetime64(
             datetime.datetime.strptime(v.decode('ascii'), '%y%m%d_%H%M%S')
@@ -159,9 +187,38 @@ def _load_file(filename):
     data = np.loadtxt(filename, dtype=dtype,
                delimiter=';',
                skiprows=1,
+               usecols=tuple(file_col_indices),
                converters={0: parsetime},
                )
-               
+    
+    # We still need to handle columns not in the file
+    not_in_file = [field not in file_fields for field, *_ in data_description]
+        
+    if any(not_in_file):
+        
+        # Create an empty sturctured array, and copy over columns
+        # (the copy action seems unavoidable anyway, so might as well  do something
+        # conceptually simple.)
+        
+        n_rows = data.shape[0]        
+        dtype = [dtype for _, dtype, *_ in data_description]        
+        data_out = np.zeros(n_rows, dtype=dtype)
+        
+        # Copy existing:
+        for dfield in data.dtype.names:
+            data_out[dfield] = data[dfield]
+            
+        # Substitute missing values
+        for desired_field, dtype, fill_value, *_ in data_description:
+            if desired_field in file_fields:
+                continue
+            
+            data_out[dtype[0]] = fill_value
+            
+        data = data_out         
+    
+    
+    # Do some quick and dirty fixes on the data fields:
     broken_sensor = data['pool1'] < -5.0
     data['pool1'][broken_sensor] = np.NaN
 
@@ -201,3 +258,12 @@ def insert_NaNs_for_gaps(d, missing_data_threshold_minutes):
         points_inserted += 1
 
     return d
+
+
+#%% Testing code
+    
+if __name__ == "__main__":
+    
+    data = get_data(17)
+    print(data)
+    
