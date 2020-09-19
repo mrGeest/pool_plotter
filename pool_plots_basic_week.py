@@ -183,7 +183,19 @@ def make_plots():
     cpu_temp_file = "pool_cpu_temp_last_week.svg"
     f.savefig(os.path.join(__location__, cpu_temp_file))
    
-    return water_temp_file, sunambient_temp_file, enclosure_temp_file, cpu_temp_file
+    
+    f,a = make_plot('Control Temperature',
+              d['datetime'], # x axis
+              [(d['control'], 'Control')], # Y trace(s)
+              "Reference temperature (°C)", # y/ax1 label
+              "(°F)", # y/ax2 label
+              xlim=[xmin,xmax],
+              )
+    control_temp_file = "pool_control_temp_past_week.svg"
+    f.savefig(os.path.join(__location__, control_temp_file))
+    
+    
+    return water_temp_file, sunambient_temp_file, enclosure_temp_file, cpu_temp_file, control_temp_file
 
 
 if __name__ == '__main__':

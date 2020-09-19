@@ -154,7 +154,7 @@ def _load_file(filename):
              ('enclosure (°C)',    ('enclosure', 'f4'),             np.NaN),
              ('pool1 (°C)',        ('pool1', 'f4'),                 np.NaN),
              ('pool2 (°C)',        ('pool2', 'f4'),                 np.NaN),
-             #('control (°C)',      ('control', 'f4'),               np.NaN),
+             ('control (°C)',      ('control', 'f4'),               np.NaN),
              ('sun_ambient (°C)',  ('sunambient', 'f4'),            np.NaN),
              ]
     
