@@ -20,9 +20,9 @@ except:
 
 
 # Place the temperature in the header
-source_file = '/var/www/html/index2.html'
-shadow_file = '/var/www/html/index_temp.html'
-out_file = '/var/www/html/index.html'
+source_file = '/var/www/pool/html/index2.html'
+shadow_file = '/var/www/pool/html/index_temp.html'
+out_file = '/var/www/pool/html/index.html'
 
 
 with open(source_file, 'r') as fin, open(shadow_file, 'w+') as fout:
