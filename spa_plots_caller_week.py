@@ -24,7 +24,7 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 try:
     # path_config will exist on the server
     import path_config    
-    web_server_folder = path_config.web_server_folder_pool
+    web_server_folder = path_config.web_server_folder_spa
 except:
     # Probably debug running locally
     web_server_folder = None
@@ -38,10 +38,7 @@ def copy_files(files):
             copyfile(os.path.join(__location__, file), web_server_folder + file)
     
 
-import pool_plots_basic_week
-outfiles = pool_plots_basic_week.make_plots()
+import spa_plots_basic_week
+outfiles = spa_plots_basic_week.make_plots()
 copy_files(outfiles)
     
-#import pool_plots_week_power
-#outfiles = pool_plots_week_power.make_plots()
-#copy_files(outfiles)

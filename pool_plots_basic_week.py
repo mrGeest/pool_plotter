@@ -139,6 +139,7 @@ def make_plots():
     xmin = np.datetime64(start_of_period)
     xmax = np.datetime64(end_of_today) #+ np.timedelta64(1, 'ms')
     
+    outfiles = []
 
     f,a = make_plot('Temperatures',
               d['datetime'], # x axis
@@ -147,9 +148,9 @@ def make_plots():
               "(°F)", # y/ax2 label
               xlim=[xmin,xmax],
               )
-    water_temp_file = "pool_temp_last_week.svg"
-    f.savefig(os.path.join(__location__, water_temp_file))
-
+    filename = "pool_temp_last_week.svg"
+    f.savefig(os.path.join(__location__, filename))
+    outfiles.append(filename)
 
     f,a = make_plot('sunambient',
               d['datetime'], # x axis
@@ -158,8 +159,9 @@ def make_plots():
               "(°F)", # y/ax2 label
               xlim=[xmin,xmax],
               )
-    sunambient_temp_file = "sunambient_temp_last_week.svg"
-    f.savefig(os.path.join(__location__, sunambient_temp_file))
+    filename = "sunambient_temp_last_week.svg"
+    f.savefig(os.path.join(__location__, filename))
+    outfiles.append(filename)
 
 
     f,a = make_plot('Enclosure',
@@ -169,8 +171,9 @@ def make_plots():
               "(°F)", # y/ax2 label
               xlim=[xmin,xmax],
               )
-    enclosure_temp_file = "enclosure_temp_last_week.svg"
-    f.savefig(os.path.join(__location__, enclosure_temp_file))
+    filename = "enclosure_temp_last_week.svg"
+    f.savefig(os.path.join(__location__, filename))
+    outfiles.append(filename)
 
     
     f,a = make_plot('CPU Temperature',
@@ -180,8 +183,9 @@ def make_plots():
               "(°F)", # y/ax2 label
               xlim=[xmin,xmax],
               )
-    cpu_temp_file = "pool_cpu_temp_last_week.svg"
-    f.savefig(os.path.join(__location__, cpu_temp_file))
+    filename = "pool_cpu_temp_last_week.svg"
+    f.savefig(os.path.join(__location__, filename))
+    outfiles.append(filename)
    
     
     f,a = make_plot('Control Temperature',
@@ -191,11 +195,12 @@ def make_plots():
               "(°F)", # y/ax2 label
               xlim=[xmin,xmax],
               )
-    control_temp_file = "pool_control_temp_past_week.svg"
-    f.savefig(os.path.join(__location__, control_temp_file))
+    filename = "pool_control_temp_past_week.svg"
+    f.savefig(os.path.join(__location__, filename))
+    outfiles.append(filename)
     
     
-    return water_temp_file, sunambient_temp_file, enclosure_temp_file, cpu_temp_file, control_temp_file
+    return outfiles
 
 
 if __name__ == '__main__':

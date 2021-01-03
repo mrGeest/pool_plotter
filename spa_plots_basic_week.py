@@ -5,6 +5,7 @@ Created on Tue May 12 09:28:59 2020
 @author: Martin
 """
 
+
 import numpy as np
 import matplotlib
 matplotlib.use('svg')
@@ -28,7 +29,7 @@ today = datetime.date.today()
 
 #%% Load some data
 
-d = dataloader.get_data(hours_to_load=12*31*24)
+d = dataloader.get_data(hours_to_load=7*24)
 
 @ticker.FuncFormatter
 def c2f_formatter(x, pos):
@@ -39,19 +40,17 @@ def c2f_formatter(x, pos):
 
 def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
 
-    
-    major_locator = mdates.MonthLocator()
-    minor_locator = mdates.WeekdayLocator(byweekday=1, interval=1)
-    x_major_fmt = mdates.DateFormatter('%b\n %Y')
-    #x_minor_fmt = mdates.DateFormatter('%d')
+
+    major_locator = mdates.HourLocator(interval=12)   # every year
+    minor_locator = mdates.HourLocator(interval=2)  # every half hour
+    x_major_fmt = mdates.DateFormatter('%H:%M')
     
     # Use a custom formatter function to mark noon special
     @ticker.FuncFormatter
     def x_formatter(x, pos):
         # Get the "stock" xtick label:
         xlab_default = x_major_fmt(x, pos)
-        return xlab_default
-    
+
         if xlab_default != "00:00":
             # No label
             return " "
@@ -84,15 +83,13 @@ def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
 
     # format the ticks
     ax1.xaxis.set_major_locator(major_locator)
-    ax1.xaxis.set_major_formatter(x_major_fmt)
+    ax1.xaxis.set_major_formatter(x_formatter)
     ax1.xaxis.set_minor_locator(minor_locator)
-    #ax1.xaxis.set_minor_formatter(x_minor_fmt)
     #f.autofmt_xdate()
 
     ax2 = ax1.twinx()
     ax2.set_ylabel(ylab2)
     plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
-    plt.setp(ax1.xaxis.get_minorticklabels(), rotation=30, horizontalalignment='right', fontsize=9 )
 
     
     # Adjust x range
@@ -133,66 +130,77 @@ def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
 
 def make_plots():
 
-    number_of_days = 31*12
+    number_of_days = 7
     start_of_period = datetime.datetime.combine(today-datetime.timedelta(days=number_of_days-1), datetime.datetime.min.time())
-#    end_of_today = datetime.datetime.combine(today, datetime.datetime.max.time())
+    end_of_today = datetime.datetime.combine(today, datetime.datetime.max.time())
     end_of_today = datetime.datetime.combine(today+datetime.timedelta(days=1), datetime.datetime.min.time())
 
 
     xmin = np.datetime64(start_of_period)
     xmax = np.datetime64(end_of_today) #+ np.timedelta64(1, 'ms')
     
-    outfiles = []
+    out_list = []
 
-    f,a = make_plot('Temperatures',
+#    f,a = make_plot('Temperatures',
+#              d['datetime'], # x axis
+#              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
+#              "Temperature (°C)", # y/ax1 label
+#              "(°F)", # y/ax2 label
+#              xlim=[xmin,xmax],
+#              )
+#    filename = "spa_temp_last_week.svg"
+#    f.savefig(os.path.join(__location__, filename))
+#    out_list.append(filename)
+
+    f,a = make_plot('sunambient',
               d['datetime'], # x axis
-              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
-              "Temperature (°C)", # y/ax1 label
+              [(d['sunambient'], 'Ambient in sun')], # Y trace(s)
+              "Ambient/sun temperature (°C)", # y/ax1 label
               "(°F)", # y/ax2 label
               xlim=[xmin,xmax],
               )
-    filename = "pool_temp_past_year.svg"
+    filename = "spa_sunambient_temp_last_week.svg"
     f.savefig(os.path.join(__location__, filename))
-    outfiles.append(filename)
+    out_list.append(filename)
 
-#
-#    f,a = make_plot('sunambient',
-#              d['datetime'], # x axis
-#              [(d['sunambient'], 'Ambient in sun')], # Y trace(s)
-#              "Ambient/sun temperature (°C)", # y/ax1 label
-#              "(°F)", # y/ax2 label
-#              #xlim=[xmin,xmax],
-#              )
-#    filename = "sunambient_temp_last_year.svg"
-#    f.savefig(os.path.join(__location__, filename))
-3    outfiles.append(filename)
-#
-#
+
 #    f,a = make_plot('Enclosure',
 #              d['datetime'], # x axis
 #              [(d['enclosure'], 'Enclosure')], # Y trace(s)
 #              "Enclosure temperature (°C)", # y/ax1 label
 #              "(°F)", # y/ax2 label
-#              #xlim=[xmin,xmax],
+#              xlim=[xmin,xmax],
 #              )
-#    filename = "enclosure_temp_last_year.svg"
+#    filename = "spa_enclosure_temp_last_week.svg"
 #    f.savefig(os.path.join(__location__, filename))
-#    outfiles.append(filename)
+#    out_list.append(filename)
 
-#
-#    
+    
 #    f,a = make_plot('CPU Temperature',
 #              d['datetime'], # x axis
 #              [(d['cpu_temperature'], 'BMP180')], # Y trace(s)
 #              "CPU temperature (°C)", # y/ax1 label
 #              "(°F)", # y/ax2 label
-#              #xlim=[xmin,xmax],
+#              xlim=[xmin,xmax],
 #              )
-#    filename = "pool_cpu_temp_last_year.svg"
+#    filename = "spa_pool_cpu_temp_last_week.svg"
 #    f.savefig(os.path.join(__location__, filename))
-#    outfiles.append(filename)
+#    out_list.append(filename)
    
-    return outfiles
+    
+#    f,a = make_plot('Control Temperature',
+#              d['datetime'], # x axis
+#              [(d['control'], 'Control')], # Y trace(s)
+#              "Reference temperature (°C)", # y/ax1 label
+#              "(°F)", # y/ax2 label
+#              xlim=[xmin,xmax],
+#              )
+#    filename = "spa_pool_control_temp_past_week.svg"
+#    f.savefig(os.path.join(__location__, filename))
+#    out_list.append(filename)
+    
+    
+    return out_list
 
 
 if __name__ == '__main__':

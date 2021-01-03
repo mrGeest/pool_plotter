@@ -142,30 +142,29 @@ def make_plots():
     xmin = np.datetime64(start_of_period)
     xmax = np.datetime64(end_of_today) #+ np.timedelta64(1, 'ms')
     
-    outfiles = []
+    out_list = []
 
-    f,a = make_plot('Temperatures',
-              d['datetime'], # x axis
-              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
-              "Temperature (°C)", # y/ax1 label
-              "(°F)", # y/ax2 label
-              xlim=[xmin,xmax],
-              )
-    filename = "pool_temp_past_year.svg"
-    f.savefig(os.path.join(__location__, filename))
-    outfiles.append(filename)
-
-#
-#    f,a = make_plot('sunambient',
+#    f,a = make_plot('Temperatures',
 #              d['datetime'], # x axis
-#              [(d['sunambient'], 'Ambient in sun')], # Y trace(s)
-#              "Ambient/sun temperature (°C)", # y/ax1 label
+#              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
+#              "Temperature (°C)", # y/ax1 label
 #              "(°F)", # y/ax2 label
-#              #xlim=[xmin,xmax],
+#              xlim=[xmin,xmax],
 #              )
-#    filename = "sunambient_temp_last_year.svg"
+#    filename = "spa_temp_past_year.svg"
 #    f.savefig(os.path.join(__location__, filename))
-3    outfiles.append(filename)
+#    out_list.append(filename)
+
+    f,a = make_plot('sunambient',
+              d['datetime'], # x axis
+              [(d['sunambient'], 'Ambient in sun')], # Y trace(s)
+              "Ambient/sun temperature (°C)", # y/ax1 label
+              "(°F)", # y/ax2 label
+              #xlim=[xmin,xmax],
+              )
+    filename = "spa_sunambient_temp_last_year.svg"
+    f.savefig(os.path.join(__location__, filename))
+    out_list.append(filename)
 #
 #
 #    f,a = make_plot('Enclosure',
@@ -177,8 +176,7 @@ def make_plots():
 #              )
 #    filename = "enclosure_temp_last_year.svg"
 #    f.savefig(os.path.join(__location__, filename))
-#    outfiles.append(filename)
-
+#    out_list.append(filename)
 #
 #    
 #    f,a = make_plot('CPU Temperature',
@@ -190,9 +188,9 @@ def make_plots():
 #              )
 #    filename = "pool_cpu_temp_last_year.svg"
 #    f.savefig(os.path.join(__location__, filename))
-#    outfiles.append(filename)
+#    out_list.append(filename)
    
-    return outfiles
+    return out_list
 
 
 if __name__ == '__main__':

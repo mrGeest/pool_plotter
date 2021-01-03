@@ -103,17 +103,18 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
 
 def make_plots():
       
-    outfiles = []
-      
-    f,a = make_plot('Temperatures',
-              d['datetime'], # x axis
-              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
-              "Temperature (°F)", # y/ax1 label
-              "Temperature (°C)", # y/ax2 label
-              )
-    filename = "pool_temp_last24.svg"
-    f.savefig(os.path.join(__location__, filename))
-    outfiles.append(filename)
+    out_list = []
+    
+#    f,a = make_plot('Temperatures',
+#              d['datetime'], # x axis
+#              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
+#              "Temperature (°F)", # y/ax1 label
+#              "Temperature (°C)", # y/ax2 label
+#              )
+#    filename = "pool_temp_last24.svg"
+#    f.savefig(os.path.join(__location__, filename))
+#    out_list.append(filename)
+
 
     f,a = make_plot('sunambient',
               d['datetime'], # x axis
@@ -121,32 +122,31 @@ def make_plots():
               "Ambient/sun temperature (°F)", # y/ax1 label
               "(°C)", # y/ax2 label
               )
-    filename = "sunambient_temp_last24.svg"
+    filename = "spa_sunambient_temp_last24.svg"
     f.savefig(os.path.join(__location__, filename))
-    outfiles.append(filename)
+    out_list.append(filename)
 
-    f,a = make_plot('Enclosure',
-              d['datetime'], # x axis
-              [(d['enclosure'], 'Enclosure')], # Y trace(s)
-              "Enclosure temperature (°F)", # y/ax1 label
-              "(°C)", # y/ax2 label
-              )
-    filename = "enclosure_temp_last24.svg"
-    f.savefig(os.path.join(__location__, filename))
-    outfiles.append(filename)
+#    f,a = make_plot('Enclosure',
+#              d['datetime'], # x axis
+#              [(d['enclosure'], 'Enclosure')], # Y trace(s)
+#              "Enclosure temperature (°F)", # y/ax1 label
+#              "(°C)", # y/ax2 label
+#              )
+#    filename = "enclosure_temp_last24.svg"
+#    f.savefig(os.path.join(__location__, filename))
+#    out_list.append(filename)
     
-    f,a = make_plot('CPU Temperature',
-              d['datetime'], # x axis
-              [(d['cpu_temperature'], 'BMP180')], # Y trace(s)
-              "CPU temperature (°F)", # y/ax1 label
-              "(°C)", # y/ax2 label
-              )
-    filename = "pool_cpu_temp_last24.svg"
-    f.savefig(os.path.join(__location__, filename))
-    outfiles.append(filename)
-    
+#    f,a = make_plot('CPU Temperature',
+#              d['datetime'], # x axis
+#              [(d['cpu_temperature'], 'BMP180')], # Y trace(s)
+#              "CPU temperature (°F)", # y/ax1 label
+#              "(°C)", # y/ax2 label
+#              )
+#    filename = "spa_cpu_temp_last24.svg"
+#    f.savefig(os.path.join(__location__, filename))
+#    out_list.append(filename)    
 
-    return outfiles
+    return out_list
 
 if __name__ == '__main__':
     make_plots()
