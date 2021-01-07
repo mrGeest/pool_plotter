@@ -13,10 +13,12 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 from distutils.version import StrictVersion
-from shutil import copyfile
+#from shutil import copyfile
 import datetime
 
+
 import dataloader
+import spa_helper
 
 # Store the location of the current file to later print the files
 import os
@@ -24,7 +26,16 @@ __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file
 
 #%% Load some data
 
-d = dataloader.get_data(hours_to_load=27) # We want the last 24 hours, +2 more to correlate trends
+selected_data = [
+     ('datetime',          ('datetime', 'datetime64[ms]'),  0),
+     ('CPU temp (°C)',     ('cpu_temperature', 'f4'),       np.NaN),
+     ('sun_ambient (°C)',  ('sunambient', 'f4'),            np.NaN),
+     ('spa1 (raw)',  ('spa1', 'f4'),            np.NaN),
+     ('spa2 (raw)',  ('spa2', 'f4'),            np.NaN),
+     ('spa3 (raw)',  ('spa3', 'f4'),            np.NaN),
+     ]
+
+d = dataloader.get_data(hours_to_load=27, selected_channels=selected_data) # We want the last 24 hours, +2 more to correlate trends
 
 #%% Inner plot function
 
@@ -33,7 +44,7 @@ def c2f_formatter(x, pos): # Arguments name x and pos for clarity w.r.t. matplot
     deg_F = ((x/5)*9)+32
     return f"{deg_F:0.1f}"
 
-def make_plot(fnum, x, ydata, ylab, ylab2):
+def make_plot(fnum, x, ydata, ylab, ylab2, left_side_formatter=c2f_formatter):
 
     hours = mdates.HourLocator(interval=2)   # every year
     minutes = mdates.MinuteLocator(interval=30)  # every half hour
@@ -65,11 +76,12 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax1.xaxis.set_major_formatter(x_major_fmt)
     ax1.xaxis.set_minor_locator(minutes)
 
-    ax2 = ax1.twinx()
-    ax2.set_ylabel(ylab2)
+    if ylab2 is not None:
+        ax2 = ax1.twinx()
+        ax2.set_ylabel(ylab2)
 
-    ax2.spines['top'].set_visible(False)
-    ax2.spines['left'].set_visible(False)
+        ax2.spines['top'].set_visible(False)
+        ax2.spines['left'].set_visible(False)
 
 
     # round x range to nearest hours.
@@ -88,10 +100,12 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     
     # ax2 is empty, so the default y range is 0.0 to 1.0.
     # Set it to match such that the ticks line up:
-    ax2.set_ylim(yt[0], yt[-1])
+    if ylab2 is not None:
+        ax2.set_ylim(yt[0], yt[-1])
     
     # Overwrite the tick decorator to convert C to F dynamically:
-    ax1.yaxis.set_major_formatter(c2f_formatter)
+    if left_side_formatter is not None:
+        ax1.yaxis.set_major_formatter(left_side_formatter)
     
     
     ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
@@ -103,17 +117,20 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
 
 def make_plots():
       
-    out_list = []
+    # Convert some
+    sensor1_celcius, sensor3_celcius= spa_helper.convert_raw_values(d)
     
-#    f,a = make_plot('Temperatures',
-#              d['datetime'], # x axis
-#              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
-#              "Temperature (°F)", # y/ax1 label
-#              "Temperature (°C)", # y/ax2 label
-#              )
-#    filename = "pool_temp_last24.svg"
-#    f.savefig(os.path.join(__location__, filename))
-#    out_list.append(filename)
+    out_list = [] # Collects filenames
+    
+    f,a = make_plot('Temperatures',
+              d['datetime'], # x axis
+              [(sensor1_celcius, 'Sensor 1'), (sensor3_celcius, 'Sensor 3')], # Y trace(s)
+              "Temperature (°F)", # y/ax1 label
+              "Temperature (°C)", # y/ax2 label
+              )
+    filename = "spa_temp_last24.svg"
+    f.savefig(os.path.join(__location__, filename))
+    out_list.append(filename)
 
 
     f,a = make_plot('sunambient',
@@ -126,15 +143,16 @@ def make_plots():
     f.savefig(os.path.join(__location__, filename))
     out_list.append(filename)
 
-#    f,a = make_plot('Enclosure',
-#              d['datetime'], # x axis
-#              [(d['enclosure'], 'Enclosure')], # Y trace(s)
-#              "Enclosure temperature (°F)", # y/ax1 label
-#              "(°C)", # y/ax2 label
-#              )
-#    filename = "enclosure_temp_last24.svg"
-#    f.savefig(os.path.join(__location__, filename))
-#    out_list.append(filename)
+    f,a = make_plot('Raw values',
+              d['datetime'], # x axis
+              [(d['spa1'], 'Sensor 1'), (d['spa2'], 'Sensor 2'), (d['spa3'], 'Sensor 3')], # Y trace(s)
+              "Raw ADC values (0-1)", # y/ax1 label
+              None, # y/ax2 label
+              None, # left side formatter
+              )
+    filename = "spa_raw_values_past24.svg"
+    f.savefig(os.path.join(__location__, filename))
+    out_list.append(filename)
     
 #    f,a = make_plot('CPU Temperature',
 #              d['datetime'], # x axis

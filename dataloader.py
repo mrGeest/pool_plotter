@@ -28,7 +28,8 @@ except:
     
 def get_data(hours_to_load=26, 
              samples_per_hour=None, 
-             missing_data_threshold_minutes=10):
+             missing_data_threshold_minutes=10,
+             selected_channels=None):
     """Load data.
     Inputs:
         hours_to_load:
@@ -57,7 +58,7 @@ def get_data(hours_to_load=26,
         fullfile = text_code
         
         try:
-            d_this = _load_file(fullfile)
+            d_this = _load_file(fullfile, selected_channels=selected_channels)
             #print("Loaded ", fullfile)
         except:
             #print('failded for :', fullfile)
@@ -142,13 +143,14 @@ def get_data(hours_to_load=26,
 #%%
 
 
-def _load_file(filename):
+def _load_file(filename, selected_channels=None):
     
     # Data description should look like a list :
     # ('log file header name (exact)', ('fieldname_for_numpy', 'dtype'), fill_value)
     # Extra header columns are ignored
     # Missing columns are filled out with NaN
-    data_description = [
+    if selected_channels is None:
+        data_description = [
              ('datetime',          ('datetime', 'datetime64[ms]'),  0),
              ('CPU temp (°C)',     ('cpu_temperature', 'f4'),       np.NaN),
              ('enclosure (°C)',    ('enclosure', 'f4'),             np.NaN),
@@ -157,6 +159,8 @@ def _load_file(filename):
              ('control (°C)',      ('control', 'f4'),               np.NaN),
              ('sun_ambient (°C)',  ('sunambient', 'f4'),            np.NaN),
              ]
+    else:
+        data_description = selected_channels
     
     desired_fields = [ t[0] for t in data_description ]
 
@@ -217,13 +221,14 @@ def _load_file(filename):
             
         data = data_out         
     
-    
     # Do some quick and dirty fixes on the data fields:
-    broken_sensor = data['pool1'] < -5.0
-    data['pool1'][broken_sensor] = np.NaN
+    if 'pool1' in data.dtype.names:
+        broken_sensor = data['pool1'] < -5.0
+        data['pool1'][broken_sensor] = np.NaN
 
-    broken_sensor = data['pool2'] < -5.0
-    data['pool2'][broken_sensor] = np.NaN
+    if 'pool2' in data.dtype.names:
+        broken_sensor = data['pool2'] < -5.0
+        data['pool2'][broken_sensor] = np.NaN
 
     return data
 

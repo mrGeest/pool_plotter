@@ -17,6 +17,7 @@ from distutils.version import StrictVersion
 import datetime
 
 import dataloader
+import spa_helper
 
 # Path to current folder for output files
 import os
@@ -29,7 +30,18 @@ today = datetime.date.today()
 
 #%% Load some data
 
-d = dataloader.get_data(hours_to_load=7*24)
+selected_data = [
+     ('datetime',          ('datetime', 'datetime64[ms]'),  0),
+     ('CPU temp (°C)',     ('cpu_temperature', 'f4'),       np.NaN),
+     ('sun_ambient (°C)',  ('sunambient', 'f4'),            np.NaN),
+     ('spa1 (raw)',  ('spa1', 'f4'),            np.NaN),
+     ('spa2 (raw)',  ('spa2', 'f4'),            np.NaN),
+     ('spa3 (raw)',  ('spa3', 'f4'),            np.NaN),
+     ]
+
+d = dataloader.get_data(hours_to_load=7*24, selected_channels=selected_data)
+
+# Helper function
 
 @ticker.FuncFormatter
 def c2f_formatter(x, pos):
@@ -129,7 +141,10 @@ def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
 #%%
 
 def make_plots():
-
+    
+    # Convert some
+    sensor1_celcius, sensor3_celcius= spa_helper.convert_raw_values(d)
+    
     number_of_days = 7
     start_of_period = datetime.datetime.combine(today-datetime.timedelta(days=number_of_days-1), datetime.datetime.min.time())
     end_of_today = datetime.datetime.combine(today, datetime.datetime.max.time())
@@ -141,16 +156,16 @@ def make_plots():
     
     out_list = []
 
-#    f,a = make_plot('Temperatures',
-#              d['datetime'], # x axis
-#              [(d['pool1'], 'Sensor 1'), (d['pool2'], 'Sensor 2')], # Y trace(s)
-#              "Temperature (°C)", # y/ax1 label
-#              "(°F)", # y/ax2 label
-#              xlim=[xmin,xmax],
-#              )
-#    filename = "spa_temp_last_week.svg"
-#    f.savefig(os.path.join(__location__, filename))
-#    out_list.append(filename)
+    f,a = make_plot('Temperatures',
+              d['datetime'], # x axis
+              [(sensor1_celcius, 'Sensor 1'), (sensor3_celcius, 'Sensor 2')], # Y trace(s)
+              "Temperature (°C)", # y/ax1 label
+              "(°F)", # y/ax2 label
+              xlim=[xmin,xmax],
+              )
+    filename = "spa_temp_past_week.svg"
+    f.savefig(os.path.join(__location__, filename))
+    out_list.append(filename)
 
     f,a = make_plot('sunambient',
               d['datetime'], # x axis
