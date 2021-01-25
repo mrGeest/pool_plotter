@@ -50,7 +50,7 @@ def c2f_formatter(x, pos):
 
 #%% Plot function
 
-def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
+def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None, left_side_formatter=c2f_formatter, finer_ygrid=False):
 
 
     major_locator = mdates.HourLocator(interval=12)   # every year
@@ -129,10 +129,22 @@ def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
     ax2.set_ylim(yt[0], yt[-1])
 
     # Overwrite the tick decorator to convert C to F dynamically:
-    ax2.yaxis.set_major_formatter(c2f_formatter)
-
+    if left_side_formatter is not None:
+        ax1.yaxis.set_major_formatter(left_side_formatter)
+    
     ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
     ax1.grid(b=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
+
+    if finer_ygrid:
+        ax1.yaxis.set_minor_locator(ticker.AutoMinorLocator(4))
+        ax2.yaxis.set_minor_locator(ticker.AutoMinorLocator(4))
+        
+        ax1.tick_params(which='minor', 
+               length=1.5,
+               )
+        ax2.tick_params(which='minor', 
+               length=1.5,
+               )
 
 
     #f.tight_layout()
@@ -143,7 +155,7 @@ def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
 def make_plots():
     
     # Convert some
-    sensor1_celcius, sensor3_celcius= spa_helper.convert_raw_values(d)
+    sensor1_celcius, sensor3_celcius, Arms = spa_helper.convert_raw_values(d)
     
     number_of_days = 7
     start_of_period = datetime.datetime.combine(today-datetime.timedelta(days=number_of_days-1), datetime.datetime.min.time())
@@ -155,6 +167,18 @@ def make_plots():
     xmax = np.datetime64(end_of_today) #+ np.timedelta64(1, 'ms')
     
     out_list = []
+
+    f,a = make_plot('Phase current',
+              d['datetime'], # x axis
+              [(Arms, 'Current')], # Y trace(s)
+              "Phase current (Arms)", # y/ax1 label
+              "Phase current (Arms)", # y/ax2 label
+              left_side_formatter=None,
+              finer_ygrid=True,
+              )
+    filename = "spa_Iphase_past_week.svg"
+    f.savefig(os.path.join(__location__, filename))
+    out_list.append(filename)
 
     f,a = make_plot('Temperatures',
               d['datetime'], # x axis

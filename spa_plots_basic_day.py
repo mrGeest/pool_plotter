@@ -44,14 +44,14 @@ def c2f_formatter(x, pos): # Arguments name x and pos for clarity w.r.t. matplot
     deg_F = ((x/5)*9)+32
     return f"{deg_F:0.1f}"
 
-def make_plot(fnum, x, ydata, ylab, ylab2, left_side_formatter=c2f_formatter):
+def make_plot(fnum, x, ydata, ylab, ylab2, left_side_formatter=c2f_formatter, finer_ygrid=False):
 
     hours = mdates.HourLocator(interval=2)   # every year
     minutes = mdates.MinuteLocator(interval=30)  # every half hour
     x_major_fmt = mdates.DateFormatter('%H:%M')
 
 
-    f,ax1 = plt.subplots(num=fnum, clear=True)
+    f, ax1 = plt.subplots(num=fnum, clear=True)
 
     f.set_size_inches(10, 6)
 
@@ -70,6 +70,8 @@ def make_plot(fnum, x, ydata, ylab, ylab2, left_side_formatter=c2f_formatter):
 
     ax1.spines['top'].set_visible(False)
     ax1.spines['right'].set_visible(False)
+
+
 
     # format the ticks
     ax1.xaxis.set_major_locator(hours)
@@ -111,6 +113,17 @@ def make_plot(fnum, x, ydata, ylab, ylab2, left_side_formatter=c2f_formatter):
     ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
     ax1.grid(b=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
 
+    if finer_ygrid:
+        ax1.yaxis.set_minor_locator(ticker.AutoMinorLocator(4))
+        ax2.yaxis.set_minor_locator(ticker.AutoMinorLocator(4))
+        
+        ax1.tick_params(which='minor', 
+               length=1.5,
+               )
+        ax2.tick_params(which='minor', 
+               length=1.5,
+               )
+
     plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
 
     return f, ax1
@@ -118,7 +131,7 @@ def make_plot(fnum, x, ydata, ylab, ylab2, left_side_formatter=c2f_formatter):
 def make_plots():
       
     # Convert some
-    sensor1_celcius, sensor3_celcius= spa_helper.convert_raw_values(d)
+    sensor1_celcius, sensor3_celcius, Arms = spa_helper.convert_raw_values(d)
     
     out_list = [] # Collects filenames
     
@@ -129,6 +142,18 @@ def make_plots():
               "Temperature (°C)", # y/ax2 label
               )
     filename = "spa_temp_last24.svg"
+    f.savefig(os.path.join(__location__, filename))
+    out_list.append(filename)
+
+    f,a = make_plot('Phase current',
+              d['datetime'], # x axis
+              [(Arms, 'Current')], # Y trace(s)
+              "Phase current (Arms)", # y/ax1 label
+              "Phase current (Arms)", # y/ax2 label
+              left_side_formatter=None,
+              finer_ygrid=True,
+              )
+    filename = "spa_Iphase_last24.svg"
     f.savefig(os.path.join(__location__, filename))
     out_list.append(filename)
 

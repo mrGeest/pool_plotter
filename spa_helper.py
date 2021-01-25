@@ -26,4 +26,14 @@ def convert_raw_values(data):
     R_ntc = R_pullup*values/(1-values)
     sensor3_celcius = R_to_T_type1(R_ntc)
 
-    return sensor1_celcius, sensor3_celcius
+    # Do the phase current transducer
+    # The sensor converts 0 - 50 Arms to 0-5V
+    # This voltage goes through a 8.2 / 15 kOhm divider to step
+    # it down to the 3.3 V range that the ADC wants.    
+    gain_multiplier_relative_to_Arms = 3.3 * (15+8.2)/15 * 10
+
+    Arms = data['spa2'] * gain_multiplier_relative_to_Arms
+    
+    
+
+    return sensor1_celcius, sensor3_celcius, Arms

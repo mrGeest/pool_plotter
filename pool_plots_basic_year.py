@@ -165,7 +165,7 @@ def make_plots():
 #              )
 #    filename = "sunambient_temp_last_year.svg"
 #    f.savefig(os.path.join(__location__, filename))
-3    outfiles.append(filename)
+#    outfiles.append(filename)
 #
 #
 #    f,a = make_plot('Enclosure',
