@@ -175,6 +175,7 @@ def make_plots():
               "Phase current (Arms)", # y/ax2 label
               left_side_formatter=None,
               finer_ygrid=True,
+              xlim=[xmin,xmax],
               )
     filename = "spa_Iphase_past_week.svg"
     f.savefig(os.path.join(__location__, filename))
@@ -183,8 +184,8 @@ def make_plots():
     f,a = make_plot('Temperatures',
               d['datetime'], # x axis
               [(sensor1_celcius, 'Sensor 1'), (sensor3_celcius, 'Sensor 2')], # Y trace(s)
-              "Temperature (°C)", # y/ax1 label
-              "(°F)", # y/ax2 label
+              "(°F)", # y/ax1 label
+              "Temperature (°C)", # y/ax2 label
               xlim=[xmin,xmax],
               )
     filename = "spa_temp_past_week.svg"
@@ -194,8 +195,8 @@ def make_plots():
     f,a = make_plot('sunambient',
               d['datetime'], # x axis
               [(d['sunambient'], 'Ambient in sun')], # Y trace(s)
-              "Ambient/sun temperature (°C)", # y/ax1 label
-              "(°F)", # y/ax2 label
+              "(°F)", # y/ax1 label
+              "Ambient/sun temperature (°C)", # y/ax2 label
               xlim=[xmin,xmax],
               )
     filename = "spa_sunambient_temp_last_week.svg"
