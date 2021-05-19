@@ -42,3 +42,8 @@ outfiles = pool_plots_basic_year.make_plots()
 copy_files(outfiles)
   
 
+import pool_plots_year_on_year
+outfiles = pool_plots_year_on_year.make_plots()
+copy_files(outfiles)
+  
+

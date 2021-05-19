@@ -29,8 +29,10 @@ except:
 def get_data(hours_to_load=26, 
              samples_per_hour=None, 
              missing_data_threshold_minutes=10,
-             selected_channels=None):
-    """Load data.
+             selected_channels=None,
+             dt_start=None,
+             dt_end=None):
+    """Load data. 
     Inputs:
         hours_to_load:
             Specifiy the number of hours to load. Default 26. Must be integer
@@ -43,19 +45,52 @@ def get_data(hours_to_load=26,
             If data is missing for more than this amount of time, insert
             a NaN to break up the plots. 0 disables.
             
+        dt_start:
+            Alternative to hours_to_load. If dt_start is not None, data is loaded from this date time object onwards
+            dt_end must not be empty
+        
+        dt_end:
+            loads data up to this datetime. Ignored if dt_start=None
+            
+            
     """
         
     now = datetime.datetime.now() # Capture the present time, in case the script runs an hour or day boundary
     
     # Step 1 - Sequentially load all relevant data
+    # Step 1a, compile a list of files that need to be loaded
+    files_to_load = []
+    
+    if dt_start is None:
+        # Simple mode, where we load from x hours ago, till the present
+        for hours_ago in range(hours_to_load, -1, -1):
+        
+            dt = now - datetime.timedelta(hours=hours_ago)
+            text_code = data_folder + file_prefix + dt.strftime('%y%m%d%H.txt')
+        
+            files_to_load.append(text_code)
+
+    else:
+        # More advanced mode, where a specific range is loaded.
+        dt_running = dt_start
+        step = datetime.timedelta(hours=1)
+        while dt_running < dt_end:
+            
+            full_file = data_folder + file_prefix + dt_running.strftime('%y%m%d%H.txt')
+            
+            files_to_load.append(full_file)
+            
+            dt_running += step
+            
+        # Calculate hours to load, as it is still used for tge dow sample filter
+        hours_to_load = (dt_end - dt_start)/datetime.timedelta(hours=1)
+        
+    #print(files_to_load)
+    
+    # Step 1b, load that list of files
     first_file_loaded = False
     
-    for hours_ago in range(hours_to_load, -1, -1):
-    
-        dt = now - datetime.timedelta(hours=hours_ago)
-        text_code = data_folder + file_prefix + dt.strftime('%y%m%d%H.txt')
-    
-        fullfile = text_code
+    for fullfile in files_to_load:
         
         try:
             d_this = _load_file(fullfile, selected_channels=selected_channels)
@@ -75,7 +110,6 @@ def get_data(hours_to_load=26,
     if not first_file_loaded:
         raise Exception('No data for entire range.')
         
-        
     # Step 2 - insert NaNs for gaps in data
     if missing_data_threshold_minutes > 0:
         d = insert_NaNs_for_gaps(d, missing_data_threshold_minutes) 
@@ -93,6 +127,8 @@ def get_data(hours_to_load=26,
         else:
             # Loooong
             samples_per_hour = 2000/hours_to_load
+            
+            
             
     if samples_per_hour > 0:
         # Greater than 0 means downsampling must be applied.

@@ -42,3 +42,6 @@ outfiles = pool_plots_basic_month.make_plots()
 copy_files(outfiles)
 
 
+import pool_plots_month_on_month
+outfiles = pool_plots_month_on_month.make_plots()
+copy_files(outfiles)
