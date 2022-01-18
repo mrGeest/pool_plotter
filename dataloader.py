@@ -266,6 +266,10 @@ def _load_file(filename, selected_channels=None):
         broken_sensor = data['pool2'] < -5.0
         data['pool2'][broken_sensor] = np.NaN
 
+    if 'sunambient' in data.dtype.names:
+        broken_sensor = data['sunambient'] < -10.0
+        data['sunambient'][broken_sensor] = np.NaN
+
     return data
 
 
