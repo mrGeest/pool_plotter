@@ -9,7 +9,6 @@ Created on Tue May 12 09:28:59 2020
 import numpy as np
 import matplotlib
 matplotlib.use('svg')
-import numpy as np
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
@@ -123,8 +122,8 @@ def make_plot(fnum, x, ydata, ylab, ylab2, xlim=None):
     # Overwrite the tick decorator to convert C to F dynamically:
     ax2.yaxis.set_major_formatter(c2f_formatter)
 
-    ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
-    ax1.grid(b=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
+    ax1.grid(visible=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
+    ax1.grid(visible=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
 
 
     #f.tight_layout()

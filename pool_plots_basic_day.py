@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 import matplotlib.ticker as ticker
 from distutils.version import StrictVersion
-from shutil import copyfile
+#from shutil import copyfile
 import datetime
 
 import dataloader
@@ -94,8 +94,8 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax1.yaxis.set_major_formatter(c2f_formatter)
     
     
-    ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
-    ax1.grid(b=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
+    ax1.grid(visible=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
+    ax1.grid(visible=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
 
     plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
 
