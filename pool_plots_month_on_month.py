@@ -138,8 +138,8 @@ def make_plot(fnum, all_data, ylab, ylab2, xlim=None):
     # Overwrite the tick decorator to convert C to F dynamically:
     ax2.yaxis.set_major_formatter(c2f_formatter)
 
-    ax1.grid(b=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
-    ax1.grid(b=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
+    ax1.grid(visible=True, which='major', color=(0.75,0.75,0.75), linestyle='-')
+    ax1.grid(visible=True, which='minor', color=(0.8,0.8,0.8), linestyle=':')
 
 
     #f.tight_layout()
