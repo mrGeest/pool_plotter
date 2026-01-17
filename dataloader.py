@@ -188,12 +188,12 @@ def _load_file(filename, selected_channels=None):
     if selected_channels is None:
         data_description = [
              ('datetime',          ('datetime', 'datetime64[ms]'),  0),
-             ('CPU temp (°C)',     ('cpu_temperature', 'f4'),       np.NaN),
-             ('enclosure (°C)',    ('enclosure', 'f4'),             np.NaN),
-             ('pool1 (°C)',        ('pool1', 'f4'),                 np.NaN),
-             ('pool2 (°C)',        ('pool2', 'f4'),                 np.NaN),
-             ('control (°C)',      ('control', 'f4'),               np.NaN),
-             ('sun_ambient (°C)',  ('sunambient', 'f4'),            np.NaN),
+             ('CPU temp (°C)',     ('cpu_temperature', 'f4'),       np.nan),
+             ('enclosure (°C)',    ('enclosure', 'f4'),             np.nan),
+             ('pool1 (°C)',        ('pool1', 'f4'),                 np.nan),
+             ('pool2 (°C)',        ('pool2', 'f4'),                 np.nan),
+             ('control (°C)',      ('control', 'f4'),               np.nan),
+             ('sun_ambient (°C)',  ('sunambient', 'f4'),            np.nan),
              ]
     else:
         data_description = selected_channels
@@ -260,15 +260,15 @@ def _load_file(filename, selected_channels=None):
     # Do some quick and dirty fixes on the data fields:
     if 'pool1' in data.dtype.names:
         broken_sensor = data['pool1'] < -5.0
-        data['pool1'][broken_sensor] = np.NaN
+        data['pool1'][broken_sensor] = np.nan
 
     if 'pool2' in data.dtype.names:
         broken_sensor = data['pool2'] < -5.0
-        data['pool2'][broken_sensor] = np.NaN
+        data['pool2'][broken_sensor] = np.nan
 
     if 'sunambient' in data.dtype.names:
         broken_sensor = data['sunambient'] < -10.0
-        data['sunambient'][broken_sensor] = np.NaN
+        data['sunambient'][broken_sensor] = np.nan
 
     return data
 
@@ -295,7 +295,7 @@ def insert_NaNs_for_gaps(d, missing_data_threshold_minutes):
             if name == 'datetime':
                 line[name] = dt_fake
             else:
-                line[name] = np.NaN
+                line[name] = np.nan
                 
         # Insert the line
         d = np.insert(d, gi, line)
