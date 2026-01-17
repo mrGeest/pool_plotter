@@ -221,7 +221,7 @@ def _load_file(filename, selected_channels=None):
         
     def parsetime(v):
         return np.datetime64(
-            datetime.datetime.strptime(v.decode('ascii'), '%y%m%d_%H%M%S')
+            datetime.datetime.strptime(v, '%y%m%d_%H%M%S')
         )
     
     data = np.loadtxt(filename, dtype=dtype,
