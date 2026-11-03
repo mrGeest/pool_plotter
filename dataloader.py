@@ -229,6 +229,7 @@ def _load_file(filename, selected_channels=None):
                skiprows=1,
                usecols=tuple(file_col_indices),
                converters={0: parsetime},
+               encoding=None,
                )
     
     # We still need to handle columns not in the file
