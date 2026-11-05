@@ -18,24 +18,24 @@ from shutil import copyfile
 __location__ = os.path.realpath(os.path.join(os.getcwd(), os.path.dirname(__file__)))
     
 
-
-
-#%% ---- Step 1, copy files from the upload folder to the local archiving folder ----
-"""
-# This only matters on the server, does nothing when running for debugging.
-
 try:
     # path_config will exist on the server
     import path_config    
     upload_folder = path_config.upload_folder
     archive_folder = path_config.data_folder
-    web_server_folder = path_config.web_server_folder_pool
+    web_server_folder = path_config.web_server_folder_bdw
 except:
     # Probably debug running locally
     upload_folder = None
     archive_folder = '../pool_logger_data/'
     web_server_folder = None
     
+
+
+#%% ---- Step 1, copy files from the upload folder to the local archiving folder ----
+"""
+# This only matters on the server, does nothing when running for debugging.
+
 
 file_prefix = 'pool_' # May be empty to copy any file
     
