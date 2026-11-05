@@ -74,7 +74,7 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
 
     ax1.spines['top'].set_visible(False)
     ax1.spines['right'].set_visible(False)
-
+    
     # format the ticks
     ax1.xaxis.set_major_locator(hours)
     ax1.xaxis.set_major_formatter(x_major_fmt)
@@ -83,8 +83,9 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax2 = ax1.twinx()
     #ax2.set_ylabel(ylab2)
 
-    #ax2.spines['top'].set_visible(False)
-    #ax2.spines['left'].set_visible(False)
+    ax2.spines['top'].set_visible(False)
+    ax2.spines['left'].set_visible(False)
+    ax2.spines['bottom'].set_visible(False)
 
 
     # round x range to nearest hours.
@@ -112,7 +113,7 @@ def make_plot(fnum, x, ydata, ylab, ylab2):
     ax1.grid(visible=True, which='major', color=(0.35,0.35,0.35), linestyle='-')
     ax1.grid(visible=True, which='minor', color=(0.4,0.4,0.4), linestyle=':')
 
-    plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
+    #plt.setp(ax1.xaxis.get_majorticklabels(), rotation=30, horizontalalignment='right' )
 
     return f, ax1
 
